@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  title String @unique
+  items Item[]
+}
+
+model Store {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  branches    Branch[]
+  items       Item[]
+}
+
+model Branch {
+  id      Int    @id @default(autoincrement())
+  name    String
+  lat     String
+  long    String
+  city    String @default("dubai")
+  state   STATE  @default(dubai)
+  country String
+  storeId Int
+  store   Store  @relation(fields: [storeId], references: [id])
+  items   Item[]
+}
+
+model Item {
+  id          Int      @id @default(autoincrement())
+  name        String
+  price       Float    @default(0)
+  currency    CURRENCY @default(AED)
+  description String?
+  label       Json[]   @default([])
+  storeId     Int
+  store       Store    @relation(fields: [storeId], references: [id])
+  branchId    Int
+  branch      Branch   @relation(fields: [branchId], references: [id])
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id])
+}
+
+enum CURRENCY {
+  AED
+}
+
+enum STATE {
+  dubai
+  abudhabi
+  ajman
+  sharjah
+}
